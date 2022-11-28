@@ -23,13 +23,22 @@ async function run() {
         const serviceCollection = client.db('doctors_portal_practice').collection('services');
         const bookingCollection = client.db('doctors_portal_practice').collection('bookings');
 
-        //get all available appointments / services api
+        //get all  appointments / services api
         app.get('/service', async (req, res) => {
 
             const query = {};
             const cursor = serviceCollection.find(query);
             const services = await cursor.toArray();
             res.send(services);
+
+        })
+
+        //get specific user booking
+        app.get('/booking', async (req, res) => {
+            const patient = req.query.patient;
+            const query = { patient: patient };
+            const bookings = await bookingCollection.find(query).toArray();
+            res.send(bookings);
 
         })
 
@@ -47,7 +56,9 @@ async function run() {
 
         })
 
-
+        // Warning:
+        // This is not the proper way to query
+        // After learning more about mongodb, user aggregate lookup, pipeline, match, group
         app.get('/available', async (req, res) => {
 
             const date = req.query.date || 'Nov 14, 2022';
@@ -65,7 +76,7 @@ async function run() {
                 const serviceBookings = bookings.filter(b => b.treatment === service.name);
                 // const booked = serviceBookings.map(s => s.slot);
                 service.booked = serviceBookings.map(s => s.slot);
-                service.available = service.slots.filter(x => !service.booked.includes(x))
+                service.slots = service.slots.filter(x => !service.booked.includes(x))
             })
 
 
