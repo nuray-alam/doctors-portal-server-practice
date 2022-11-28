@@ -22,6 +22,7 @@ async function run() {
         // all collections
         const serviceCollection = client.db('doctors_portal_practice').collection('services');
         const bookingCollection = client.db('doctors_portal_practice').collection('bookings');
+        const userCollection = client.db('doctors_portal_practice').collection('users');
 
         //get all  appointments / services api
         app.get('/service', async (req, res) => {
@@ -54,6 +55,20 @@ async function run() {
             const result = await bookingCollection.insertOne(booking);
             return res.send({ success: true, result });
 
+        })
+
+        //add user api
+        app.put('/user/:email', async (req, res) => {
+
+            const email = req.params.email;
+            const user = req.body;
+            const filter = { email: email };
+            const options = {upsert: true};
+            const UpdateDoc ={
+                $set:user
+            };
+            const result = await userCollection.updateOne(filter, UpdateDoc, options);
+            res.send(result);
         })
 
         // Warning:
@@ -90,6 +105,7 @@ async function run() {
          * app.get('/booking/:id') // get a specific booking
          * app.post('/booking') // add a new booking
          * app.patch('/booking/:id') // update a specific booking
+         * app.put('/booking/:id') // upsert update (if exist) or insert (if doesn't exist)
          * app.delete('/booking/:id') // delete a specific booking
          */
     }
