@@ -91,6 +91,14 @@ async function run() {
 
         })
 
+        //is admin api
+        app.get('/admin/:email', verifyToken, async (req, res) => {
+            const email = req.params.email;
+            const user = await userCollection.findOne({ email: email });
+            const isAdmin = user?.role === 'admin';
+            res.send({ isAdmin: isAdmin });
+        })
+
         //add admin api
         app.put('/user/admin/:email', verifyToken, async (req, res) => {
 
