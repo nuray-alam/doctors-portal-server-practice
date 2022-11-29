@@ -65,7 +65,7 @@ async function run() {
                 res.send(bookings);
             }
             else {
-                return res.status(403).send({message: 'forbidden access'});
+                return res.status(403).send({ message: 'forbidden access' });
             }
 
         })
@@ -85,23 +85,33 @@ async function run() {
         })
 
         //get all users
-        app.get('/user',verifyToken, async (req, res)=> {
+        app.get('/user', verifyToken, async (req, res) => {
             const users = await userCollection.find().toArray();
             res.send(users);
 
         })
 
-                //add admin api
-                app.put('/user/admin/:email',verifyToken, async (req, res) => {
+        //add admin api
+        app.put('/user/admin/:email', verifyToken, async (req, res) => {
 
-                    const email = req.params.email;
-                    const filter = { email: email };
-                    const UpdateDoc = {
-                        $set: {role: 'admin'}
-                    };
-                    const result = await userCollection.updateOne(filter, UpdateDoc);
-                    res.send(result);
-                })
+            const email = req.params.email;
+            const requester = req.decoded.email;
+            const requesterAccount = await userCollection.findOne({ email: requester });
+
+            if (requesterAccount.role === 'admin') {
+
+                const filter = { email: email };
+                const UpdateDoc = {
+                    $set: { role: 'admin' }
+                };
+                const result = await userCollection.updateOne(filter, UpdateDoc);
+                res.send(result);
+            }
+            else {
+                res.status(403).send({ message: 'forbidden' });
+            }
+
+        })
 
         //add user api
         app.put('/user/:email', async (req, res) => {
