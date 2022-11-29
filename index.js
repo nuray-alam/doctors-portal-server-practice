@@ -91,6 +91,18 @@ async function run() {
 
         })
 
+                //add admin api
+                app.put('/user/admin/:email',verifyToken, async (req, res) => {
+
+                    const email = req.params.email;
+                    const filter = { email: email };
+                    const UpdateDoc = {
+                        $set: {role: 'admin'}
+                    };
+                    const result = await userCollection.updateOne(filter, UpdateDoc);
+                    res.send(result);
+                })
+
         //add user api
         app.put('/user/:email', async (req, res) => {
 
