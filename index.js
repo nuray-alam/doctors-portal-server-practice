@@ -4,6 +4,7 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const { query } = require('express');
 const app = express()
 const port = process.env.PORT || 5000
 
@@ -80,6 +81,13 @@ async function run() {
             }
             const result = await bookingCollection.insertOne(booking);
             return res.send({ success: true, result });
+
+        })
+
+        //get all users
+        app.get('/user', async (req, res)=> {
+            const users = await userCollection.find().toArray();
+            res.send(users);
 
         })
 
