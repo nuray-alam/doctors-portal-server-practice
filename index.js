@@ -17,6 +17,22 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 
+const verifyToken = (req, res, next) => {
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send({ message: 'Unauthorized access' });
+    }
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({ message: 'forbidden access' });
+        }
+        req.decoded = decoded;
+        next();
+    });
+}
+
 async function run() {
 
     try {
@@ -36,12 +52,20 @@ async function run() {
 
         })
 
-        //get specific user booking
-        app.get('/booking', async (req, res) => {
+        //get specific user bookings
+        app.get('/booking', verifyToken, async (req, res) => {
+            const authorization = req.headers.authorization;
+            const decodedEmail = req.decoded.email;
+
             const patient = req.query.patient;
-            const query = { patient: patient };
-            const bookings = await bookingCollection.find(query).toArray();
-            res.send(bookings);
+            if (patient === decodedEmail) {
+                const query = { patient: patient };
+                const bookings = await bookingCollection.find(query).toArray();
+                res.send(bookings);
+            }
+            else {
+                return res.status(403).send({message: 'forbidden access'});
+            }
 
         })
 
