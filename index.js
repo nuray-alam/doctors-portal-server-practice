@@ -182,7 +182,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
-    res.send('Hello from doctors portal server')
+    res.send('Hello from doctors portal server , its working')
 })
 
 app.listen(port, () => {
