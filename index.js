@@ -38,6 +38,7 @@ async function run() {
 
     try {
         await client.connect();
+        console.log('database connected');
         // all collections
         const serviceCollection = client.db('doctors_portal_practice').collection('services');
         const bookingCollection = client.db('doctors_portal_practice').collection('bookings');
