@@ -43,12 +43,13 @@ async function run() {
         const serviceCollection = client.db('doctors_portal_practice').collection('services');
         const bookingCollection = client.db('doctors_portal_practice').collection('bookings');
         const userCollection = client.db('doctors_portal_practice').collection('users');
+        const doctorCollection = client.db('doctors_portal_practice').collection('doctors');
 
         //get all  appointments / services api
         app.get('/service', async (req, res) => {
 
             const query = {};
-            const cursor = serviceCollection.find(query);
+            const cursor = serviceCollection.find(query).project({ name: 1 });
             const services = await cursor.toArray();
             res.send(services);
 
@@ -164,7 +165,11 @@ async function run() {
             res.send(services)
 
         })
-
+        app.post('/doctor', async (req, res) => {
+            const doctor = req.body;
+            const result = await doctorCollection.insertOne(doctor);
+            res.send(result);
+        })
         /**
          * API Naming Convention
          * app.get('/booking') // get all bookings in this collection or get more than one or by filter
